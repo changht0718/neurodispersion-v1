@@ -1,83 +1,43 @@
-# NeuroDispersion Clinical Research Dashboard v1.1
+# NeuroDispersion Clinical Research Dashboard v1.6
 
-GitHub Pages + Supabase prototype for SCD / aMCI / DAT cognitive-profile dispersion research.
+## Current-norm scoring
+v1.6 replaces the previous DEMO raw-to-percentile mapping with the current preliminary norm.
 
-## Features
+- 15 non-scaled tests: demographic adjustment (age, education, gender) using the current NC regression coefficients, followed by empirical percentile ranking against the current NC adjusted-score distribution.
+- 10 scaled-score tests: LM-IM, LM-DEL, FP-IM, FP-DEL, ARI, DSS, SIM, MR, DS, SS. These are entered as scaled scores and converted using M = 10, SD = 3.
+- Individual test impairment cutoff: percentile <= 6.6807, corresponding to z <= -1.5 SD.
+- Domain high-dispersion cutoff: NC mean ISD + 1.5 SD.
 
-- Demographic and cardiovascular-risk-factor input
-- Raw neuropsychological score entry
-- Demo raw-score → percentile conversion (replace before research use)
-- Domain-specific mean percentile and dispersion (within-domain SD)
-- Figure 2–style domain dispersion chart
-- Figure 3–style domain percentile radar plots
-- Exploratory manuscript-derived memory profile index
-- Supabase Auth + PostgreSQL persistence
-- Row Level Security (each signed-in researcher sees only their own records)
+The current-norm dashboard battery contains 25 tests. REC, REM, TMT-B, and TMT-A are not included because they are not part of the current-norm battery supplied for v1.6.
 
-## 1. Deploy the frontend to GitHub Pages
+## ROC re-analysis
+The current-norm validation dataset contains NC and AD (plus glioma), not an MCI group. Therefore v1.6 does not claim a newly estimated SCD-vs-aMCI ROC.
 
-Upload the repository contents so that `index.html` is in the repository root.
+Using complete current-norm cases:
+- 25-test impairment burden (count of tests <= P6.68), NC vs AD: AUC = 0.881; Youden cutoff >= 3 impaired tests; sensitivity = 0.75; specificity = 0.87.
+- 7-test memory impairment burden, NC vs AD: AUC = 0.788; cutoff >= 1 impaired memory test; sensitivity = 0.74; specificity = 0.80.
+- Domain ISD alone showed weak discrimination (AUC approximately 0.51-0.59), so v1.6 does not use domain dispersion alone as an AD classifier.
 
-GitHub repository → **Settings → Pages → Deploy from a branch → main → /(root)**.
+These are cross-sectional cognitive-profile discrimination results, not longitudinal dementia probabilities.
 
-## 2. Create a Supabase project
+## Dispersion > 1.5 SD cutoffs
+- Memory: 37.61
+- Executive function: 38.95
+- Language: 39.71
+- Visuospatial function: 42.13
+- Attention/speed: 37.61
 
-Create a Supabase project, then open **SQL Editor** and run:
+A domain is flagged as high dispersion only when all tests in that domain are available.
 
-`supabase_schema.sql`
+## GitHub Pages deployment
+Upload the contents of this folder directly to the repository root so `index.html` is at the top level.
 
-This creates `public.neurodispersion_records`, enables RLS, revokes anonymous access, grants authenticated users CRUD access, and creates policies so `auth.uid()` must equal `owner_id`.
+Settings -> Pages -> Deploy from a branch -> `main` -> `/ (root)`.
 
-## 3. Create researcher accounts
+After updating, use Ctrl+F5 if the browser is showing an older cached version.
 
-For a research deployment, create user accounts in Supabase Authentication rather than allowing open public sign-up.
+## Supabase
+Keep your existing `config/supabase-config.js`. Do not place a service-role key in GitHub. The existing RLS schema remains compatible.
 
-The dashboard currently uses email/password login via `signInWithPassword()`.
-
-## 4. Configure the browser client
-
-Open:
-
-`config/supabase-config.js`
-
-and fill in:
-
-```js
-window.NEURODISPERSION_SUPABASE = {
-  url: "https://YOUR_PROJECT.supabase.co",
-  anonKey: "YOUR_PUBLISHABLE_OR_ANON_KEY"
-};
-```
-
-The publishable/anon key is intended for browser use. **Never put the `service_role` key in GitHub or browser JavaScript.** Security depends on RLS and least-privilege grants.
-
-## 5. Data model
-
-Each saved row includes:
-
-- `subject_id` — pseudonymous research ID only
-- demographics — age, sex, education, estimated premorbid IQ
-- clinical features — cardiovascular risk factors (recorded only in v1.1)
-- raw neuropsychological scores
-- converted percentiles
-- domain means and dispersions
-- exploratory profile outputs
-- model version and timestamps
-
-Do not store names, national ID numbers, phone numbers, addresses, medical-record numbers, or other direct identifiers in this prototype.
-
-## 6. Important research limitations
-
-### Norms
-`app.js` currently uses **DEMO_NORMS**. Replace them with validated Taiwanese normative conversion tables before any research or clinical interpretation.
-
-### Risk model
-The current memory-profile output is an exploratory manuscript-derived index, **not a validated probability of MCI or future dementia**. A DAT/dementia risk probability is intentionally not generated until a validated logistic/Cox/longitudinal model is supplied.
-
-### Security / governance
-Supabase provides technical access control, but deployment with real participant data still requires your institution's IRB/data-governance, retention, backup, and access-control requirements.
-
-## v1.2 chart behavior
-- Figure 2 is calculated only from the currently entered participant data; no SCD/aMCI/DAT reference curves are plotted.
-- Figure 3 radar plots are calculated only from the currently entered participant raw scores after percentile conversion.
-- Demo values are no longer loaded automatically on page open; the demo button must be clicked explicitly.
+## Research-use warning
+This dashboard is a research prototype. The AD-like impairment-burden flag is not a diagnosis. aMCI/DAT classification still requires clinical context, including functional status, CDR/ADL, history, and clinician judgment.

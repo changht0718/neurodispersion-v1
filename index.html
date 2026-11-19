@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NeuroDispersion Clinical Research Dashboard v1.0</title>
+  <title>NeuroDispersion Clinical Research Dashboard v1.6</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="topbar">
     <div>
       <h1>NeuroDispersion Clinical Research Dashboard</h1>
-      <p>研究用 v1.0｜SCD / aMCI / DAT cognitive-profile dispersion</p>
+      <p>研究用 v1.6｜Current-norm cognitive dispersion｜NC / AD reference</p>
     </div>
     <div class="badge">RESEARCH USE ONLY</div>
   </header>
@@ -55,12 +55,12 @@
           <label><input class="inline-check" type="checkbox" id="af"/> 心房顫動</label>
           <label><input class="inline-check" type="checkbox" id="stroke"/> 腦中風史</label>
         </div>
-        <p class="note">v1.0 會儲存/顯示心血管風險因子，但<strong>不納入風險計算</strong>。</p>
+        <p class="note">v1.6 會儲存/顯示心血管風險因子，但<strong>不納入 current-norm 認知計算</strong>。</p>
       </section>
 
       <section class="panel-block">
-        <h2><span>3</span> 神經心理原始分數</h2>
-        <p class="note warning">目前內建為示範常模。正式使用前，請以你的台灣常模表覆蓋 <code>config/norms.demo.json</code>。</p>
+        <h2><span>3</span> 神經心理測驗分數</h2>
+        <p class="note warning">Current norm：LM、FP、ARI、DSS、SIM、MR、DS、SS 請輸入 scaled score（M=10, SD=3）；其餘 15 項以 current NC demographic-adjusted empirical percentile 計算。紅色 percentile 代表 ≤ −1.5 SD（P6.68）。</p>
         <div id="testInputs"></div>
       </section>
 
@@ -74,16 +74,16 @@
     <section class="output-panel">
       <div class="output-header">
         <h2>自動報告輸出</h2>
-        <span id="normStatus" class="status-pill">DEMO NORMS</span>
+        <span id="normStatus" class="status-pill">CURRENT NORM</span>
       </div>
 
       <div class="cards top-cards">
         <article class="card risk-card">
-          <h3>認知風險分層</h3>
+          <h3>Current-norm 認知異常分層</h3>
           <div class="risk-scale"><span>低</span><span>中</span><span>高</span></div>
           <div id="riskBand" class="risk-band medium">待分析</div>
           <div id="riskValue" class="risk-value">—</div>
-          <p id="riskNote" class="muted">memory-profile model 尚未計算。</p>
+          <p id="riskNote" class="muted">依 −1.5 SD impairment burden 與 current-norm ROC 判讀。</p>
         </article>
 
         <article class="card">
@@ -94,23 +94,30 @@
         <article class="card">
           <h3>模型狀態</h3>
           <div class="model-state">
-            <p><strong>aMCI：</strong><span id="mciModelState">研究型 profile score</span></p>
-            <p><strong>DAT：</strong><span id="datModelState">未載入獨立風險模型</span></p>
-            <p><strong>心血管：</strong>僅記錄，不參與 v1.0 計算</p>
+            <p><strong>aMCI：</strong><span id="mciModelState">客觀記憶缺損 criterion</span></p>
+            <p><strong>AD-like：</strong><span id="datModelState">current-norm impairment-burden ROC</span></p>
+            <p><strong>心血管：</strong>僅記錄，不參與 v1.6 current-norm 計算</p>
           </div>
         </article>
       </div>
 
       <article class="card wide">
         <div class="card-head">
-          <div><h3>Figure 2 style｜Domain dispersion</h3><p class="muted">由目前受試者輸入資料計算之五個 cognitive domains within-domain percentile SD</p></div>
+          <div><h3>Figure 2 style｜Domain dispersion</h3><p class="muted">個案 ISD 以 current norm percentile 計算；↑ 表示完整 domain 的 ISD 高於 NC mean + 1.5 SD。</p></div>
+          <div class="reference-controls" aria-label="Current norm reference overlays">
+            <span class="reference-label">顯示</span>
+            <label class="reference-chip"><input id="showCutoff" type="checkbox" checked> 1.5 SD cutoff</label>
+            <label class="reference-chip"><input id="showNC" type="checkbox"> NC</label>
+            <label class="reference-chip"><input id="showAD" type="checkbox"> AD</label>
+            <label class="reference-chip"><input id="showGlioma" type="checkbox"> Glioma</label>
+          </div>
         </div>
         <div id="dispersionChart" class="chart"></div>
       </article>
 
       <article class="card wide">
         <div class="card-head">
-          <div><h3>Figure 3 style｜Neuropsychological percentile profile</h3><p class="muted">由目前受試者 raw scores 轉換之 test-level percentile radar</p></div>
+          <div><h3>Figure 3 style｜Neuropsychological percentile profile</h3><p class="muted">由 current norm 轉換的 test-level percentile radar；紅點表示 ≤P6.68（−1.5 SD）</p></div>
         </div>
         <div id="radarGrid" class="radar-grid"></div>
       </article>
@@ -123,11 +130,12 @@
   </main>
 
   <footer>
-    <strong>Research prototype:</strong> 不可作為診斷工具；百分等級與風險模型必須以正式常模與經驗證模型替換後才能進行研究部署。
+    <strong>Research prototype:</strong> 不可作為單獨診斷工具；v1.6 使用 current preliminary norm。ROC 為橫斷面 NC vs AD profile discrimination，不代表未來失智機率。
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config/supabase-config.js"></script>
-  <script src="app.js"></script>
+  <script src="config/current-norm.js?v=1.6"></script>
+  <script src="app.js?v=1.6"></script>
 </body>
 </html>
