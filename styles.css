@@ -18,3 +18,14 @@ footer{max-width:1600px;margin:0 auto 20px;padding:0 20px;color:#6d7f8f;font-siz
 .saved-item{border:1px solid #dbe5ec;border-radius:10px;padding:9px 10px;background:#fff;display:flex;justify-content:space-between;gap:8px;align-items:center}
 .saved-item button{padding:6px 10px;font-size:.82rem}
 .data-note{font-size:.82rem;line-height:1.45;color:#607487}
+
+.reference-controls{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap;margin-left:16px}
+.reference-label{font-size:11px;font-weight:800;color:#607487;margin-right:2px}
+.reference-chip{display:inline-flex;align-items:center;gap:5px;margin:0;padding:5px 8px;border:1px solid #cbdce8;border-radius:999px;background:#f8fbfd;color:#385268;font-size:11px;cursor:pointer;white-space:nowrap}
+.reference-chip input{width:auto;margin:0;accent-color:#0b8e99}
+.reference-chip:has(input:checked){background:#eaf7f8;border-color:#79c5cc;color:#0a6872}
+@media(max-width:760px){.card-head{flex-direction:column;gap:8px}.reference-controls{justify-content:flex-start;margin-left:0}}
+
+.score-type{font-size:9px;color:#0d7f86;background:#e5f6f6;border-radius:4px;padding:1px 4px;margin-left:3px;font-weight:700;}
+
+.pct.impaired{background:#ffe2df;color:#b42318;font-weight:800;border:1px solid #f2b8b2}

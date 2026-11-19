@@ -1,17 +1,7 @@
 {
-  "status": "DEMO_ONLY",
-  "description": "Replace this file with validated Taiwanese normative tables before research deployment.",
-  "schema": {
-    "test": "REC",
-    "strata": [
-      {
-        "age_min": 60,
-        "age_max": 69,
-        "education_min": 0,
-        "education_max": 6,
-        "sex": null,
-        "points": [[0,1],[5,10],[10,50],[15,90],[20,99]]
-      }
-    ]
-  }
+  "status": "PARTIAL_V1_5",
+  "description": "Wechsler/WMS scaled-score subtests are converted using the conventional scaled-score metric (M=10, SD=3). All other tests remain DEMO_ONLY until validated Taiwanese normative lookup tables are loaded.",
+  "scaled_score_tests": ["LM_IM","LM_DEL","FP_IM","FP_DEL","ARI","DSS","SIM","MR","DS","SS"],
+  "scaled_score_range": [1,19],
+  "raw_norm_required_tests": ["REC","REM","WSLT_IM","WSLT_DEL","BVRT","TMT_B","CTT_2","mCST_CAT","mCST_PE","VNT","TT","SAVF","JLO","3D","PP_D","PP_ND","PP_B","TMT_A","CTT_1"]
 }
