@@ -1,3 +1,37 @@
+# NeuroDispersion v1.8.1 — 77-NC current norm + 522 full-battery + 687 common-test reanalysis
+
+# 77-NC current norm reanalysis — retrospective 522 sample
+
+## Sample
+SCD n=199, aMCI n=233, DAT n=90 (total n=522). All available raw scores were re-converted using the 77-NC age/education/sex regression-adjusted current norm; PR <= 8 was treated as approximately -1.5 SD.
+
+## Main profile result
+Memory ISD: SCD 27.56, aMCI 24.17, DAT 15.66. This differs from the earlier conventional-norm result: under the 77-NC current norm, SCD has the highest memory dispersion and DAT the lowest.
+
+Mean memory PR: SCD 54.16, aMCI 26.80, DAT 15.98.
+
+## ROC
+- SCD vs aMCI, memory mean PR: AUC .866; cutoff <=41.14; sensitivity .826; specificity .770.
+- SCD vs aMCI, proportion of available memory tests at PR<=8: AUC .825; cutoff >=20%; sensitivity .808; specificity .776.
+- aMCI vs DAT, total impairment proportion (PR<=8): AUC .731; cutoff >=40.9%; sensitivity .614; specificity .789.
+
+These are cross-sectional classification cutoffs, not longitudinal conversion-risk estimates.
+
+## Glioma / 687-person note
+The SAV contains all 687 case labels (199/233/90/165), but the 165 glioma rows do not contain the same participant-level raw-score fields. The older glioma data are stored in separate modules/files. Therefore the 522 memory-clinic sample is fully reprocessed; the 165 glioma cohort was recovered from the separate SAV and reprocessed on the tests shared across all four groups; see `analysis/retrospective687_common_test_currentnorm_summary.csv`.
+
+# NeuroDispersion v1.7 — 77-NC current norm
+
+This build replaces the earlier provisional norm engine with the values in `ISD_Report2025_latest.pdf`.
+
+- Normative sample: NC n=77.
+- All 25 tests: demographic regression adjustment for age, education, and sex.
+- Percentile conversion: Table 5 adjusted-score thresholds (PR 1–99).
+- Lower-is-better measures (CTT-1, CTT-2, mCST-PE) are direction-reversed after percentile lookup.
+- Low performance: PR <= 8 (~ -1.5 SD), matching the report.
+- Within-domain ISD reference: Table 7; high dispersion = NC P92 and low dispersion = NC P8.
+- The old ROC estimates are disabled. The 687-person retrospective sample must be reprocessed from participant-level raw scores using this same norm before new ROC cutoffs are reported.
+
 # NeuroDispersion Clinical Research Dashboard v1.6
 
 ## Current-norm scoring

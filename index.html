@@ -10,7 +10,7 @@
   <header class="topbar">
     <div>
       <h1>NeuroDispersion Clinical Research Dashboard</h1>
-      <p>研究用 v1.6｜Current-norm cognitive dispersion｜NC / AD reference</p>
+      <p>研究用 v1.8｜77-NC current norm｜SCD / aMCI / DAT reanalysis</p>
     </div>
     <div class="badge">RESEARCH USE ONLY</div>
   </header>
@@ -106,10 +106,10 @@
           <div><h3>Figure 2 style｜Domain dispersion</h3><p class="muted">個案 ISD 以 current norm percentile 計算；↑ 表示完整 domain 的 ISD 高於 NC mean + 1.5 SD。</p></div>
           <div class="reference-controls" aria-label="Current norm reference overlays">
             <span class="reference-label">顯示</span>
-            <label class="reference-chip"><input id="showCutoff" type="checkbox" checked> 1.5 SD cutoff</label>
-            <label class="reference-chip"><input id="showNC" type="checkbox"> NC</label>
-            <label class="reference-chip"><input id="showAD" type="checkbox"> AD</label>
-            <label class="reference-chip"><input id="showGlioma" type="checkbox"> Glioma</label>
+            <label class="reference-chip"><input id="showCutoff" type="checkbox" checked> NC P92 cutoff</label>
+            <label class="reference-chip"><input id="showSCD" type="checkbox"> SCD</label>
+            <label class="reference-chip"><input id="showaMCI" type="checkbox"> aMCI</label>
+            <label class="reference-chip"><input id="showDAT" type="checkbox"> DAT</label>
           </div>
         </div>
         <div id="dispersionChart" class="chart"></div>
@@ -135,7 +135,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config/supabase-config.js"></script>
-  <script src="config/current-norm.js?v=1.6"></script>
-  <script src="app.js?v=1.6"></script>
+    <script src="app.js?v=1.8"></script>
 </body>
 </html>
