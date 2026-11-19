@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NeuroDispersion Clinical Research Dashboard v1.0</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>NeuroDispersion Clinical Research Dashboard</h1>
+      <p>研究用 v1.0｜SCD / aMCI / DAT cognitive-profile dispersion</p>
+    </div>
+    <div class="badge">RESEARCH USE ONLY</div>
+  </header>
+
+  <main class="layout">
+    <aside class="input-panel">
+
+      <section class="panel-block">
+        <h2><span>0</span> Supabase 儲存</h2>
+        <div class="auth-bar">
+          <label>Email<input id="authEmail" type="email" placeholder="researcher@example.com" autocomplete="username" /></label>
+          <label>Password<input id="authPassword" type="password" placeholder="Password" autocomplete="current-password" /></label>
+        </div>
+        <div class="actions" style="margin-top:10px">
+          <button id="loginBtn" class="secondary">登入</button>
+          <button id="logoutBtn" class="ghost">登出</button>
+          <button id="saveDbBtn" class="primary">儲存個案</button>
+          <button id="refreshDbBtn" class="ghost">重新整理</button>
+        </div>
+        <p id="authStatus" class="auth-status">尚未連接 Supabase。</p>
+        <div id="savedRecords" class="saved-list"></div>
+        <p class="data-note">建議僅使用研究編號，不輸入姓名、身分證號、電話或可直接識別個人的資訊。資料庫以登入帳號 + RLS 隔離。</p>
+      </section>
+      <section class="panel-block">
+        <h2><span>1</span> 基本資料</h2>
+        <label>受試者編號<input id="subjectId" value="SUBJ-2026-001" /></label>
+        <div class="grid2">
+          <label>年齡<input id="age" type="number" value="70" /></label>
+          <label>性別<select id="sex"><option value="M">男性</option><option value="F">女性</option></select></label>
+          <label>教育年數<input id="education" type="number" value="12" /></label>
+          <label>估計基準智力<input id="premorbidIq" type="number" value="100" /></label>
+        </div>
+      </section>
+
+      <section class="panel-block">
+        <h2><span>2</span> 臨床特徵</h2>
+        <div class="grid2 compact">
+          <label><input class="inline-check" type="checkbox" id="htn"/> 高血壓</label>
+          <label><input class="inline-check" type="checkbox" id="dm"/> 糖尿病</label>
+          <label><input class="inline-check" type="checkbox" id="hld"/> 高血脂</label>
+          <label><input class="inline-check" type="checkbox" id="smoking"/> 吸菸史</label>
+          <label><input class="inline-check" type="checkbox" id="af"/> 心房顫動</label>
+          <label><input class="inline-check" type="checkbox" id="stroke"/> 腦中風史</label>
+        </div>
+        <p class="note">v1.0 會儲存/顯示心血管風險因子，但<strong>不納入風險計算</strong>。</p>
+      </section>
+
+      <section class="panel-block">
+        <h2><span>3</span> 神經心理原始分數</h2>
+        <p class="note warning">目前內建為示範常模。正式使用前，請以你的台灣常模表覆蓋 <code>config/norms.demo.json</code>。</p>
+        <div id="testInputs"></div>
+      </section>
+
+      <div class="actions">
+        <button id="demoBtn" class="secondary">載入示範個案</button>
+        <button id="runBtn" class="primary">分析並生成報告</button>
+        <button id="exportBtn" class="ghost">匯出 JSON</button>
+      </div>
+    </aside>
+
+    <section class="output-panel">
+      <div class="output-header">
+        <h2>自動報告輸出</h2>
+        <span id="normStatus" class="status-pill">DEMO NORMS</span>
+      </div>
+
+      <div class="cards top-cards">
+        <article class="card risk-card">
+          <h3>認知風險分層</h3>
+          <div class="risk-scale"><span>低</span><span>中</span><span>高</span></div>
+          <div id="riskBand" class="risk-band medium">待分析</div>
+          <div id="riskValue" class="risk-value">—</div>
+          <p id="riskNote" class="muted">memory-profile model 尚未計算。</p>
+        </article>
+
+        <article class="card">
+          <h3>臨床特徵摘要</h3>
+          <div id="clinicalSummary" class="summary-lines"></div>
+        </article>
+
+        <article class="card">
+          <h3>模型狀態</h3>
+          <div class="model-state">
+            <p><strong>aMCI：</strong><span id="mciModelState">研究型 profile score</span></p>
+            <p><strong>DAT：</strong><span id="datModelState">未載入獨立風險模型</span></p>
+            <p><strong>心血管：</strong>僅記錄，不參與 v1.0 計算</p>
+          </div>
+        </article>
+      </div>
+
+      <article class="card wide">
+        <div class="card-head">
+          <div><h3>Figure 2 style｜Domain dispersion</h3><p class="muted">個案 within-domain percentile SD 疊加研究參考曲線</p></div>
+        </div>
+        <div id="dispersionChart" class="chart"></div>
+      </article>
+
+      <article class="card wide">
+        <div class="card-head">
+          <div><h3>Figure 3 style｜Neuropsychological percentile profile</h3><p class="muted">各 cognitive domain 的 test-level percentile radar</p></div>
+        </div>
+        <div id="radarGrid" class="radar-grid"></div>
+      </article>
+
+      <article class="card wide">
+        <h3>結構化研究報告</h3>
+        <div id="report" class="report"></div>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <strong>Research prototype:</strong> 不可作為診斷工具；百分等級與風險模型必須以正式常模與經驗證模型替換後才能進行研究部署。
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config/supabase-config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
