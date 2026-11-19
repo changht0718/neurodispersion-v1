@@ -1,0 +1,27 @@
+{
+  "version": "prototype-1.0",
+  "mci_profile": {
+    "type": "weighted_profile_index",
+    "status": "exploratory_not_probability",
+    "cutoff": 32.70,
+    "direction": "lower_is_more_amci_like",
+    "coefficients": {
+      "REC": -0.25,
+      "REM": -0.31,
+      "WSLT_IM": 0.07,
+      "WSLT_DEL": -0.12,
+      "BVRT": -0.02,
+      "LM_IM": -0.05,
+      "LM_DEL": 0.22,
+      "FP_IM": 0.13,
+      "FP_DEL": -0.06
+    }
+  },
+  "dementia_risk": {
+    "status": "NOT_CONFIGURED",
+    "required": "Validated logistic or Cox model with intercept/baseline hazard and coefficients"
+  },
+  "cardiovascular": {
+    "included_in_v1_model": false
+  }
+}
