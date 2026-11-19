@@ -76,3 +76,8 @@ The current memory-profile output is an exploratory manuscript-derived index, **
 
 ### Security / governance
 Supabase provides technical access control, but deployment with real participant data still requires your institution's IRB/data-governance, retention, backup, and access-control requirements.
+
+## v1.2 chart behavior
+- Figure 2 is calculated only from the currently entered participant data; no SCD/aMCI/DAT reference curves are plotted.
+- Figure 3 radar plots are calculated only from the currently entered participant raw scores after percentile conversion.
+- Demo values are no longer loaded automatically on page open; the demo button must be clicked explicitly.

@@ -17,13 +17,6 @@ const DEMO_NORMS = {
 
 const DEMO_RAW = {REC:13,REM:12,WSLT_IM:38,WSLT_DEL:7,BVRT:6,LM_IM:32,LM_DEL:17,FP_IM:39,FP_DEL:31,TMT_B:95,CTT_2:88,mCST_CAT:4,mCST_PE:7,ARI:12,DSS:61,VNT:21,TT:24,SAVF:18,SIM:19,JLO:19,"3D":12,MR:18,PP_D:12,PP_ND:11,PP_B:9,DS:11,SS:29,TMT_A:62,CTT_1:58};
 
-// Paper-like domain dispersion reference means; editable in production config.
-const REFERENCE_DISPERSION = {
-  "SCD": [28.7,20.8,26.4,14.6,22.0],
-  "aMCI": [29.1,22.7,27.2,17.2,23.8],
-  "DAT": [23.2,22.0,22.4,18.8,21.5]
-};
-
 // Research profile coefficients (illustrative manuscript-derived SCD-memory equation).
 // This is NOT a validated diagnostic probability model.
 const MEMORY_PROFILE_COEF = {REC:-0.25,REM:-0.31,WSLT_IM:0.07,WSLT_DEL:-0.12,BVRT:-0.02,LM_IM:-0.05,LM_DEL:0.22,FP_IM:0.13,FP_DEL:-0.06};
@@ -67,16 +60,33 @@ function collect(){
 function profileScore(p){return Object.entries(MEMORY_PROFILE_COEF).reduce((s,[k,b])=>s+b*(p[k]??0),0);}
 
 function svgLineChart(domains){
-  const labels=Object.keys(DOMAIN_TESTS);const W=980,H=350,pad={l:60,r:30,t:20,b:70};const yMin=0,yMax=35;
-  const x=i=>pad.l+i*(W-pad.l-pad.r)/(labels.length-1);const y=v=>pad.t+(yMax-v)*(H-pad.t-pad.b)/(yMax-yMin);
-  const colors={SCD:'#2d6fbb',aMCI:'#e7771e',DAT:'#1d1d1d',Case:'#8a4eb8'};
-  let s=`<svg viewBox="0 0 ${W} ${H}" role="img">`;
-  for(let v=0;v<=35;v+=5){s+=`<line x1="${pad.l}" y1="${y(v)}" x2="${W-pad.r}" y2="${y(v)}" stroke="#d9e3ea"/><text x="${pad.l-12}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#607487">${v}</text>`;}
-  labels.forEach((lab,i)=>{s+=`<text x="${x(i)}" y="${H-34}" text-anchor="middle" font-size="11" fill="#385268">${lab.replace(' function','')}</text>`;});
-  const series={...REFERENCE_DISPERSION,Case:labels.map(d=>domains[d].dispersion)};
-  Object.entries(series).forEach(([name,vals])=>{const pts=vals.map((v,i)=>`${x(i)},${y(v??0)}`).join(' ');s+=`<polyline points="${pts}" fill="none" stroke="${colors[name]}" stroke-width="${name==='Case'?4:3}" opacity="${name==='Case'?1:.8}"/>`;vals.forEach((v,i)=>{if(v!=null)s+=`<circle cx="${x(i)}" cy="${y(v)}" r="${name==='Case'?5:4}" fill="${colors[name]}"/>`;});});
-  s+=`<text transform="translate(18 ${H/2}) rotate(-90)" text-anchor="middle" font-size="12" fill="#334e63">Within-domain percentile SD</text></svg>`;
-  s+=`<div class="legend">${Object.entries(colors).map(([n,c])=>`<span><i style="background:${c}"></i>${n}</span>`).join('')}</div>`;return s;
+  const labels=Object.keys(DOMAIN_TESTS);
+  const values=labels.map(d=>domains[d].dispersion);
+  const finite=values.filter(Number.isFinite);
+  const observedMax=finite.length?Math.max(...finite):10;
+  const yMax=Math.max(10,Math.ceil((observedMax+3)/5)*5);
+  const W=980,H=350,pad={l:60,r:30,t:28,b:76};
+  const x=i=>pad.l+i*(W-pad.l-pad.r)/(labels.length-1);
+  const y=v=>pad.t+(yMax-v)*(H-pad.t-pad.b)/yMax;
+  const caseColor='#8a4eb8';
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Individual domain dispersion profile">`;
+  for(let v=0;v<=yMax;v+=5){
+    s+=`<line x1="${pad.l}" y1="${y(v)}" x2="${W-pad.r}" y2="${y(v)}" stroke="#d9e3ea"/><text x="${pad.l-12}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#607487">${v}</text>`;
+  }
+  labels.forEach((lab,i)=>{
+    s+=`<text x="${x(i)}" y="${H-34}" text-anchor="middle" font-size="11" fill="#385268">${lab.replace(' function','')}</text>`;
+  });
+  const pts=values.map((v,i)=>Number.isFinite(v)?`${x(i)},${y(v)}`:null).filter(Boolean).join(' ');
+  if(pts) s+=`<polyline points="${pts}" fill="none" stroke="${caseColor}" stroke-width="4"/>`;
+  values.forEach((v,i)=>{
+    if(Number.isFinite(v)){
+      s+=`<circle cx="${x(i)}" cy="${y(v)}" r="5" fill="${caseColor}"/>`;
+      s+=`<text x="${x(i)}" y="${y(v)-12}" text-anchor="middle" font-size="12" font-weight="700" fill="#5b327f">${v.toFixed(1)}</text>`;
+    }
+  });
+  s+=`<text transform="translate(18 ${H/2}) rotate(-90)" text-anchor="middle" font-size="12" fill="#334e63">Within-domain percentile SD</text>`;
+  s+=`</svg><div class="legend"><span><i style="background:${caseColor}"></i>Current participant</span></div>`;
+  return s;
 }
 
 function radarSVG(labels,vals){const W=300,H=260,cx=150,cy=125,R=92,n=labels.length;const ang=i=>-Math.PI/2+i*2*Math.PI/n;const pt=(r,i)=>[cx+r*Math.cos(ang(i)),cy+r*Math.sin(ang(i))];let s=`<svg viewBox="0 0 ${W} ${H}">`;
@@ -111,7 +121,7 @@ function run(){
 function loadDemo(){Object.entries(DEMO_RAW).forEach(([t,v])=>{document.getElementById(`raw_${t}`).value=v;updatePercentile(t)});run();}
 function exportJson(){if(!window.__lastReport)run();const blob=new Blob([JSON.stringify(window.__lastReport,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${subjectId.value||'subject'}_neurodispersion.json`;a.click();URL.revokeObjectURL(a.href);}
 
-buildInputs();document.getElementById('demoBtn').addEventListener('click',loadDemo);document.getElementById('runBtn').addEventListener('click',run);document.getElementById('exportBtn').addEventListener('click',exportJson);loadDemo();
+buildInputs();document.getElementById('demoBtn').addEventListener('click',loadDemo);document.getElementById('runBtn').addEventListener('click',run);document.getElementById('exportBtn').addEventListener('click',exportJson);
 
 // ---------------- Supabase persistence ----------------
 let sb = null;
